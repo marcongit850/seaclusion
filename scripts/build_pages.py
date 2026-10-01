@@ -54,6 +54,8 @@ GALLERY = [
     ("23.jpg", "Living room with a fireplace and a gulf view"),
     ("24.jpg", "Outdoor dining on a covered deck"),
     ("25.jpg", "Upper deck looking out over the gulf"),
+    ("26.jpg", "Dusk view of the gulf-front house from above"),
+    ("27.jpg", "Exterior of the beachfront house"),
 ]
 
 
@@ -93,9 +95,6 @@ def head(page):
   <link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32">
   <link rel="icon" href="/favicon-16x16.png" type="image/png" sizes="16x16">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&amp;family=Outfit:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css">
   {page.get("schema", "")}
 </head>
@@ -137,7 +136,6 @@ def footer():
     <div>
       <img src="/images/logo.png" alt="" width="1440" height="150" style="height:34px;width:auto;filter:brightness(0) invert(1)">
       <p>Seaclusion Beach Home</p>
-      <p>{ADDRESS}</p>
     </div>
     <div>
       <h2>Explore</h2>
@@ -166,7 +164,7 @@ def footer():
     </div>
   </div>
   <div class="wrap-wide legal">
-    <p>Seaclusion Beach Home is a gulf-front vacation rental at {ADDRESS}. 9 bedrooms, a private pool and hot tub, and a private beach. Sleeps 24.</p>
+    <p>Seaclusion Beach Home is a gulf-front vacation rental in Miramar Beach. 9 bedrooms, a private pool and hot tub, and a private beach. Sleeps 24.</p>
   </div>
 </footer>
 <script src="/site.js"></script>
@@ -242,7 +240,7 @@ def lodging_schema():
     }
     if ORIGIN:
         data["url"] = url
-        data["image"] = [abs_url("/images/hero.jpg"), abs_url("/images/gallery/02.jpg"), abs_url("/images/gallery/06.jpg")]
+        data["image"] = [abs_url("/images/hero-collage.jpg"), abs_url("/images/gallery/02.jpg"), abs_url("/images/gallery/06.jpg")]
     return '<script type="application/ld+json">' + json.dumps(data, separators=(",", ":")) + "</script>"
 
 
@@ -288,13 +286,10 @@ def shot(filename, alt, eager=False):
 
 
 def home():
-    mosaic = "".join(
-        shot(name, alt, eager=(i == 0))
-        for i, (name, alt) in enumerate([GALLERY[0], GALLERY[1], GALLERY[5], GALLERY[3], GALLERY[22]])
-    )
+    strip = "".join(shot(name, alt, eager=(i < 3)) for i, (name, alt) in enumerate(GALLERY))
     main = f"""
 <section class="hero">
-  <img src="/images/hero.jpg" alt="Gulf-front exterior of Seaclusion at dusk in Miramar Beach" width="1600" height="1067">
+  <img src="/images/hero-collage.jpg" alt="Collage of the gulf-front Seaclusion house, private pool, beach boardwalk, and decks in Miramar Beach" width="1916" height="821">
 </section>
 <section class="intro-panel">
   <div class="wrap">
@@ -321,7 +316,7 @@ def home():
 <section class="section">
   <div class="wrap split">
     <figure class="frame">
-      <img src="/images/gallery/23.jpg" alt="Living room with a fireplace and a gulf view" width="1600" height="1067">
+      <img src="/images/gallery/26.jpg" alt="Dusk view of the gulf-front house from above" width="1600" height="1066">
     </figure>
     <div class="prose">
       <p class="kicker">The house</p>
@@ -402,11 +397,22 @@ def home():
       <div>
         <p class="kicker">Gallery</p>
         <h2>The gulf, the pool, and the rooms</h2>
-        <p>Photographs from the Seaclusion gallery: the beachfront house, private pool and hot tub, kitchens, and bedrooms.</p>
+        <p>Photographs from the Seaclusion gallery: the beachfront house, private pool and hot tub, kitchens, and bedrooms. Swipe across the row, or use the arrows, to see more.</p>
       </div>
       <a class="btn btn-line" href="/gallery/">Open the full gallery</a>
     </div>
-    <div class="mosaic">{mosaic}</div>
+    <div class="filmstrip-wrap">
+      <div class="filmstrip" data-filmstrip tabindex="0" aria-label="Seaclusion photos">
+        {strip}
+      </div>
+      <div class="film-nav">
+        <p class="note">Swipe for more photos.</p>
+        <div class="actions">
+          <button class="btn btn-line" type="button" data-film-prev>Previous</button>
+          <button class="btn btn-line" type="button" data-film-next>Next</button>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 <section class="section" style="padding-top:0">
@@ -457,7 +463,7 @@ def amenities():
         ("4 bikes", "Four bikes are included."),
         ("Beach chairs", "Complimentary beach chairs are available in season."),
         ("Covered patio with games", "A covered patio with games sits with the outdoor space."),
-        ("Smart TVs and Hulu", "The TVs are smart TVs. Complimentary Hulu is provided for live TV and channels."),
+        ("Smart TVs", "The TVs are smart TVs with access to your streaming accounts."),
     ]
     cards = "".join(f"<article><h3>{title}</h3><p>{text}</p></article>" for title, text in items)
     main = f"""
@@ -478,7 +484,6 @@ def amenities():
 <section class="section" style="padding-top:0">
   <div class="wrap">
     <div class="amenity-grid">{cards}</div>
-    <p class="note" style="margin-top:1rem">Listed items are the amenities published on the Seaclusion site. Rates are not published here. Ask when you inquire.</p>
     <div class="actions">
       <a class="btn btn-solid" href="/contact/">Request to Book</a>
       <a class="btn btn-line" href="/floorplans/">See how the floors are laid out</a>
@@ -643,7 +648,7 @@ def tips():
       </li>
       <li>
         <strong>Televisions</strong>
-        The TVs are smart TVs with access to your streaming accounts. Complimentary Hulu is provided for live TV and channels.
+        The TVs are smart TVs with access to your streaming accounts.
       </li>
       <li>
         <strong>Balcony doors</strong>
@@ -786,7 +791,7 @@ PAGES = [
         "path": "/tips/",
         "file": ROOT / "tips" / "index.html",
         "title": "House Tips | Seaclusion Vacation Rental in Miramar Beach",
-        "description": "Guest notes for Seaclusion in Miramar Beach: elevator doors, smart TVs with complimentary Hulu, and hurricane locks on the balcony doors.",
+        "description": "Guest notes for Seaclusion in Miramar Beach: elevator doors, smart TVs, and hurricane locks on the balcony doors.",
         "schema": lodging_schema(),
         "body": tips,
     },

@@ -64,6 +64,12 @@ for (const page of pages) {
   assert.match(html, /property="og:description"/);
   assert.match(html, /property="og:image"/);
   assert.match(html, /330 Tango Mar Drive/);
+  const footerStart = html.indexOf("<footer");
+  assert.ok(footerStart >= 0, page.file);
+  assert.equal(html.slice(footerStart).includes("330 Tango Mar Drive"), false, page.file);
+  assert.equal(/Hulu/i.test(html), false, page.file);
+  assert.equal(html.includes("Listed items are the amenities"), false, page.file);
+  assert.equal(html.includes("fonts.googleapis.com"), false, page.file);
   assert.match(html, /Miramar Beach/);
   assert.match(html, /Sleeps 24|sleeps 24/);
   assert.match(html, /9 bedroom/i);
@@ -86,6 +92,9 @@ for (const page of pages) {
 }
 
 const home = read("index.html");
+assert.match(home, /src="\/images\/hero-collage\.jpg"/);
+assert.match(home, /width="1916" height="821"/);
+assert.equal(home.includes('src="/images/hero.jpg"'), false);
 assert.match(home, /VacationRental/);
 assert.match(home, /LodgingBusiness/);
 assert.match(home, /"numberOfBedrooms":9/);
@@ -103,7 +112,13 @@ assert.match(contact, /data-contact-form/);
 assert.match(contact, /We will get back to you ASAP/);
 
 const gallery = read("gallery/index.html");
-assert.equal((gallery.match(/data-shot/g) || []).length, 25);
+assert.equal((gallery.match(/data-shot/g) || []).length, 27);
+assert.match(gallery, /images\/gallery\/26\.jpg/);
+assert.match(gallery, /images\/gallery\/27\.jpg/);
+assert.match(home, /data-filmstrip/);
+assert.match(home, /data-film-next/);
+assert.equal((home.match(/data-shot/g) || []).length, 27);
+assert.match(home, /images\/gallery\/26\.jpg/);
 assert.match(gallery, /src="\/images\/tour\.mp4"/);
 assert.match(home, /src="\/images\/tour\.mp4"/);
 assert.equal(gallery.includes("could not be saved"), false);

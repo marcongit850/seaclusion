@@ -52,6 +52,29 @@
     });
   }
 
+  var strip = document.querySelector("[data-filmstrip]");
+  if (strip) {
+    var filmPrev = document.querySelector("[data-film-prev]");
+    var filmNext = document.querySelector("[data-film-next]");
+    var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    function scrollFilm(direction) {
+      strip.scrollBy({
+        left: Math.round(strip.clientWidth * 0.8) * direction,
+        behavior: reduceMotion ? "auto" : "smooth"
+      });
+    }
+    if (filmPrev) filmPrev.addEventListener("click", function () { scrollFilm(-1); });
+    if (filmNext) filmNext.addEventListener("click", function () { scrollFilm(1); });
+    function updateFilmCue() {
+      var wrap = strip.parentElement;
+      if (!wrap) return;
+      var atEnd = strip.scrollLeft + strip.clientWidth >= strip.scrollWidth - 8;
+      wrap.classList.toggle("is-scrolled-end", atEnd);
+    }
+    strip.addEventListener("scroll", updateFilmCue, { passive: true });
+    updateFilmCue();
+  }
+
   var form = document.querySelector("[data-contact-form]");
   if (!form) return;
 
