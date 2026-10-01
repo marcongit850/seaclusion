@@ -7,7 +7,7 @@
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
     "preview": "python3 -m http.server 8080",
-    "test": "node test/pages.test.mjs && node test/contact.test.mjs"
+    "test": "node test/pages.test.mjs && node test/contact.test.mjs && node test/security.test.mjs"
   },
   "devDependencies": {
     "wrangler": "^4.40.0"

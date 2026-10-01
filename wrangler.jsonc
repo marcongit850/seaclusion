@@ -13,7 +13,8 @@
     "binding": "ASSETS",
     "html_handling": "auto-trailing-slash",
     "not_found_handling": "404-page",
-    // Only the inquiry route invokes the Worker. Static pages stay on the asset path.
-    "run_worker_first": ["/api/contact", "/api/contact/"]
+    // Run first so www can 301 to the apex host. Pages are still static
+    // assets; only /api/contact is handled as an inquiry.
+    "run_worker_first": true
   }
 }
