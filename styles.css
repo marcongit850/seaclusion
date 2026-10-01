@@ -897,11 +897,56 @@ textarea { min-height: 9rem; resize: vertical; }
   .utility-inner { font-size: 0.72rem; }
   .section { padding: 3.4rem 0; }
   .logo { min-width: 0; }
-  .logo img { height: auto; width: auto; max-height: 28px; max-width: 42vw; }
+  .logo img { height: auto; width: auto; max-height: 28px; max-width: 100%; }
   .header-cta,
   .nav-toggle { flex: none; }
   .nav-toggle { margin-left: 0; }
   .header-cta { white-space: nowrap; }
   .filmstrip .shot,
   .filmstrip-wrap::after { height: 200px; }
+}
+
+@media (max-width: 560px) {
+  .header-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "logo toggle"
+      "cta cta";
+    align-items: center;
+    column-gap: 1rem;
+    row-gap: 0.55rem;
+    padding-block: 0.65rem 0.7rem;
+  }
+  .logo {
+    grid-area: logo;
+    margin-right: 0;
+    min-width: 0;
+    max-width: 100%;
+  }
+  .logo img {
+    height: auto;
+    width: auto;
+    max-height: 28px;
+    max-width: 100%;
+    object-fit: contain;
+    object-position: left center;
+  }
+  .nav-toggle {
+    grid-area: toggle;
+    margin-left: 0;
+    justify-self: end;
+    align-self: center;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    padding: 0.55rem 0.9rem;
+    align-items: center;
+    justify-content: center;
+  }
+  .header-cta {
+    grid-area: cta;
+    justify-self: end;
+    margin-left: 0;
+    white-space: nowrap;
+  }
 }
