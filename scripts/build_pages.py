@@ -81,10 +81,6 @@ GALLERY = [
     ("49.jpg", "Kitchen"),
     ("50.jpg", "Living room"),
     ("51.jpg", "Bedroom at Seaclusion"),
-    ("52.jpg", "Living room with seating and a gulf view"),
-    ("53.jpg", "Bedroom at Seaclusion"),
-    ("54.jpg", "Kitchen with an island"),
-    ("55.jpg", "Bedroom with two beds"),
 ]
 
 
