@@ -63,7 +63,7 @@ GALLERY = [
     ("26.jpg", "Dusk view of the gulf-front house from above"),
     ("27.jpg", "Exterior of the beachfront house"),
     ("28.jpg", "Living room with seating and a view toward the beach"),
-    ("29.jpg", "Aerial view of the house, private pool, and gulf"),
+    ("29.jpg", "Bunk room with twin-over-twin bunk beds"),
     ("30.jpg", "Living room seating"),
     ("31.jpg", "Bedroom with a door to a balcony"),
     ("32.jpg", "Aerial view of the gulf-front house and pool"),
@@ -964,7 +964,7 @@ def guides_index():
     <h1>What to sort out before you book a house that has to hold a real group on this stretch of the gulf.</h1>
     <div class="split">
       <figure class="frame">
-        <img src="/images/gallery/29.jpg" alt="Aerial view of Seaclusion, the private pool, and the gulf in Miramar Beach" width="1600" height="1067">
+        <img src="/images/gallery/32.jpg" alt="Aerial view of the gulf-front Seaclusion house, private pool, and gulf" width="1600" height="1067">
       </figure>
       <div class="prose">
         <p>These are the questions that come up before a reunion or a retreat. Will everyone actually have a bed? Is the beach private? Is the house on the quieter side of the Destin area, or on the busy sand?</p>
@@ -1208,8 +1208,8 @@ PAGES = [
         "file": ROOT / "guides" / "index.html",
         "title": "Guides | Large Gulf-Front Rentals near Destin | Seaclusion",
         "description": "Notes for booking a large gulf-front house near Destin: bedroom count, private beach access, and Miramar Beach compared with busier Destin. Seaclusion sleeps 24.",
-        "image": "/images/gallery/29.jpg",
-        "image_alt": "Aerial view of Seaclusion, the private pool, and the gulf in Miramar Beach",
+        "image": "/images/gallery/32.jpg",
+        "image_alt": "Aerial view of the gulf-front Seaclusion house, private pool, and gulf",
         "schema": guides_index_schema() + breadcrumb_schema([
             ("/", "Home"),
             ("/guides/", "Guides"),

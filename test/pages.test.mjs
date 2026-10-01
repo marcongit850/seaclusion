@@ -49,7 +49,7 @@ const pages = [
     path: "/guides/",
     h1: "What to sort out before you book a house that has to hold a real group on this stretch of the gulf.",
     title: "Large Gulf-Front Rentals near Destin",
-    image: "/images/gallery/29.jpg",
+    image: "/images/gallery/32.jpg",
   },
   {
     file: "guides/large-beach-house/index.html",
@@ -202,8 +202,20 @@ const guidesHeader = guidesHub.slice(guidesHub.indexOf("<header"), guidesHub.ind
 assert.match(guidesHeader, /href="\/guides\/" aria-current="page"/);
 assert.match(guidesHub, /Why private beach access matters/);
 assert.match(guidesHub, /private beach and boardwalk/);
-assert.equal(guidesHub.includes("/images/gallery/07.jpg"), false);
-assert.equal(guidesHub.includes("/images/gallery/34.jpg"), false);
+const bunkRoomPhotos = ["/images/gallery/07.jpg", "/images/gallery/29.jpg", "/images/gallery/34.jpg"];
+for (const file of [
+  "guides/index.html",
+  "guides/large-beach-house/index.html",
+  "guides/private-beach-access/index.html",
+  "guides/miramar-beach-vs-destin/index.html",
+  "guides/things-to-do-nearby/index.html",
+]) {
+  const html = read(file);
+  for (const photo of bunkRoomPhotos) {
+    assert.equal(html.includes(photo), false, `${file} still uses bunk-room photo ${photo}`);
+  }
+}
+assert.match(guidesHub, /Aerial view of the gulf-front Seaclusion house, private pool, and gulf/);
 const beachGuide = read("guides/private-beach-access/index.html");
 const beachHeader = beachGuide.slice(beachGuide.indexOf("<header"), beachGuide.indexOf("</header>"));
 assert.match(beachHeader, /href="\/guides\/" aria-current="page"/);
