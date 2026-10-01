@@ -850,7 +850,7 @@ def guides_index_schema():
     data = {
         "@context": "https://schema.org",
         "@type": "CollectionPage",
-        "name": "Guides for a large gulf-front rental near Destin",
+        "name": "What to sort out before you book a house that has to hold a real group on this stretch of the gulf.",
         "description": "Notes for booking a large gulf-front house near Destin. The examples are Seaclusion in Miramar Beach.",
         "mainEntity": {
             "@type": "ItemList",
@@ -958,16 +958,10 @@ def guides_index():
       </article>"""
         )
     return f"""
-<header class="page-hero">
+<header class="page-hero guide-intro">
   <div class="wrap">
     {crumbs("Guides")}
-    <p class="kicker">Notes from the house</p>
-    <h1>Guides for a large gulf-front rental near Destin</h1>
-    <p class="lede">What to sort out before you book a house that has to hold a real group on this stretch of the gulf.</p>
-  </div>
-</header>
-<section class="section">
-  <div class="wrap">
+    <h1>What to sort out before you book a house that has to hold a real group on this stretch of the gulf.</h1>
     <div class="split">
       <figure class="frame">
         <img src="/images/gallery/29.jpg" alt="Aerial view of Seaclusion, the private pool, and the gulf in Miramar Beach" width="1600" height="1067">
@@ -978,6 +972,10 @@ def guides_index():
         <p>If you already know the dates, <a href="/contact/">request to book</a>. The notes below are the longer version. Photos are in the <a href="/gallery/">gallery</a>, and the map is on the <a href="/location/">location</a> page.</p>
       </div>
     </div>
+  </div>
+</header>
+<section class="section guide-index">
+  <div class="wrap">
     <div class="guide-grid">
       {"".join(cards)}
     </div>
@@ -1078,8 +1076,8 @@ GUIDES = [
         "image": "/images/gallery/12.jpg",
         "image_alt": "View from a covered deck at Seaclusion toward the gulf",
         "caption": "The gulf from a covered deck at Seaclusion.",
-        "card_title": "Why the private beach is the week",
-        "card_text": "Gulf front means the sand is the front of the house, not a path you share with the buildings next door.",
+        "card_title": "Why private beach access matters",
+        "card_text": "Seaclusion is gulf front, with a private beach and boardwalk. The week is on that sand, not a shared public path.",
         "plug_title": "Seaclusion is that gulf-front stay",
         "plug": "Private beach, private beach boardwalk, and a private pool and hot tub on the gulf side in Miramar Beach. The house sleeps 24, with 9 bedrooms and an elevator for floors 1–3.",
     },
