@@ -1,0 +1,15 @@
+{
+  "name": "seaclusion",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "python3 scripts/build_pages.py",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "preview": "python3 -m http.server 8080",
+    "test": "node test/pages.test.mjs && node test/contact.test.mjs"
+  },
+  "devDependencies": {
+    "wrangler": "^4.40.0"
+  }
+}

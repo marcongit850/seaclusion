@@ -1,0 +1,19 @@
+{
+  // Cloudflare Worker plus static assets. The name stays seaclusion so a
+  // Workers Builds project can keep deploying this repository.
+  // An assets-only Worker has no script, so Cloudflare refuses variables
+  // ("Variables cannot be added to a Worker that only has static assets").
+  // "main" is what makes CONTACT_EMAIL, RESEND_API_KEY, and SUBSCRIBE_FROM possible.
+  // Do not put those values here.
+  "name": "seaclusion",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": ".",
+    "binding": "ASSETS",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page",
+    // Only the inquiry route invokes the Worker. Static pages stay on the asset path.
+    "run_worker_first": ["/api/contact", "/api/contact/"]
+  }
+}
