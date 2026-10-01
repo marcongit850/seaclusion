@@ -63,7 +63,7 @@ const pages = [
     path: "/guides/private-beach-access/",
     h1: "Why a private beach changes a gulf-front week",
     title: "Why Private Beach Access Matters",
-    image: "/images/gallery/12.jpg",
+    image: "/images/gallery/47.jpg",
   },
   {
     file: "guides/miramar-beach-vs-destin/index.html",
@@ -202,7 +202,12 @@ const guidesHeader = guidesHub.slice(guidesHub.indexOf("<header"), guidesHub.ind
 assert.match(guidesHeader, /href="\/guides\/" aria-current="page"/);
 assert.match(guidesHub, /Why private beach access matters/);
 assert.match(guidesHub, /private beach and boardwalk/);
-const bunkRoomPhotos = ["/images/gallery/07.jpg", "/images/gallery/29.jpg", "/images/gallery/34.jpg"];
+const bunkRoomPhotos = [
+  "/images/gallery/07.jpg",
+  "/images/gallery/12.jpg",
+  "/images/gallery/29.jpg",
+  "/images/gallery/34.jpg",
+];
 for (const file of [
   "guides/index.html",
   "guides/large-beach-house/index.html",
@@ -216,7 +221,18 @@ for (const file of [
   }
 }
 assert.match(guidesHub, /Aerial view of the gulf-front Seaclusion house, private pool, and gulf/);
+const beachAlt = "Aerial view of Seaclusion from the beach side, with the gulf in front of the house";
+const beachCard = guidesHub.slice(
+  guidesHub.indexOf('href="/guides/private-beach-access/"'),
+  guidesHub.indexOf('href="/guides/miramar-beach-vs-destin/"'),
+);
+assert.match(beachCard, /src="\/images\/gallery\/47\.jpg"/);
+assert.match(beachCard, new RegExp(beachAlt));
+assert.equal(beachCard.includes("/images/gallery/12.jpg"), false);
 const beachGuide = read("guides/private-beach-access/index.html");
+assert.match(beachGuide, /src="\/images\/gallery\/47\.jpg"/);
+assert.match(beachGuide, new RegExp(beachAlt));
+assert.match(beachGuide, /Seaclusion from the beach side, with the gulf in front of the house\./);
 const beachHeader = beachGuide.slice(beachGuide.indexOf("<header"), beachGuide.indexOf("</header>"));
 assert.match(beachHeader, /href="\/guides\/" aria-current="page"/);
 assert.match(beachGuide, /Sleeps 24/);
