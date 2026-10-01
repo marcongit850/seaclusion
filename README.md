@@ -35,15 +35,15 @@ CONTACT_EMAIL=you@example.com
 
 ## Pages
 
-- `/` — hero, highlights, the house, favorite features, floors, gallery, location, inquiry
+- `/` — hero, highlights, the house, favorite features, floors, gallery, video tour, location, inquiry
 - `/amenities/` — home information and the published amenity list
 - `/floorplans/` — first, second, and third floors, with the Wix floor-plan drawings
-- `/gallery/` — 25 photographs from the Wix gallery
+- `/gallery/` — video tour and 25 photographs from the Wix gallery
 - `/location/` — address and map
 - `/tips/` — elevator, televisions, balcony locks
 - `/contact/` — inquiry form
 
-The Wix video tour could not be saved as a file. To show it, add `images/tour.mp4`.
+The video tour plays from `images/tour.mp4` on the home page and the gallery.
 
 ## Inquiry form
 

@@ -424,6 +424,33 @@ h3 { font-size: clamp(1.55rem, 2vw, 2rem); line-height: 1.15; }
 
 .gallery-grid .shot { aspect-ratio: 3 / 2; height: auto; }
 
+.tour-layout {
+  display: grid;
+  grid-template-columns: 1.1fr 0.7fr;
+  gap: 3rem;
+  align-items: center;
+}
+
+.tour {
+  margin: 0;
+  justify-self: center;
+  width: min(100%, 380px);
+}
+
+.tour video {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 9 / 16;
+  background: var(--gulf-deep);
+  display: block;
+}
+
+.tour figcaption {
+  margin-top: 0.65rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
 .map-frame {
   border: 1px solid var(--line);
   background: var(--white);
@@ -647,7 +674,7 @@ textarea { min-height: 9rem; resize: vertical; }
 
 @media (max-width: 980px) {
   .stats { grid-template-columns: repeat(3, 1fr); }
-  .split, .split-reverse, .audience, .floors, .tips, .contact-grid, .footer-grid {
+  .split, .split-reverse, .audience, .floors, .tips, .contact-grid, .footer-grid, .tour-layout {
     grid-template-columns: 1fr;
   }
   .amenity-grid, .features, .gallery-grid { grid-template-columns: 1fr 1fr; }
