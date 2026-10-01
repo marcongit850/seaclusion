@@ -38,7 +38,7 @@ CONTACT_EMAIL=you@example.com
 - `/` — hero, highlights, the house, favorite features, floors, gallery, video tour, location, inquiry
 - `/amenities/` — home information and the published amenity list
 - `/floorplans/` — first, second, and third floors, with the Wix floor-plan drawings
-- `/gallery/` — video tour and 25 photographs from the Wix gallery
+- `/gallery/` — video tour and 51 photographs from the Wix gallery
 - `/location/` — address and map
 - `/tips/` — elevator, televisions, balcony locks
 - `/contact/` — inquiry form
