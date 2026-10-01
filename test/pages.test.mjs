@@ -125,12 +125,14 @@ assert.match(contact, /data-contact-form/);
 assert.match(contact, /We will get back to you ASAP/);
 
 const gallery = read("gallery/index.html");
-assert.equal((gallery.match(/data-shot/g) || []).length, 27);
+assert.equal((gallery.match(/data-shot/g) || []).length, 55);
 assert.match(gallery, /images\/gallery\/26\.jpg/);
 assert.match(gallery, /images\/gallery\/27\.jpg/);
 assert.match(home, /data-filmstrip/);
 assert.match(home, /data-film-next/);
-assert.equal((home.match(/data-shot/g) || []).length, 27);
+assert.equal((home.match(/data-shot/g) || []).length, 55);
+assert.match(home, /images\/gallery\/55\.jpg/);
+assert.match(gallery, /images\/gallery\/55\.jpg/);
 assert.match(home, /images\/gallery\/26\.jpg/);
 const location = read("location/index.html");
 const locationMain = location.slice(location.indexOf("<main"), location.indexOf("</main>"));
