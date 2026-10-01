@@ -636,11 +636,29 @@ textarea { min-height: 9rem; resize: vertical; }
   font-weight: 500;
 }
 
+.guide-intro h1 {
+  max-width: 16em;
+  font-size: clamp(1.85rem, 3vw, 2.55rem);
+}
+
+.guide-intro .split {
+  margin-top: 2rem;
+  align-items: start;
+}
+
+.guide-index {
+  padding-top: 2.6rem;
+}
+
 .guide-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.25rem;
   margin-top: 2.4rem;
+}
+
+.guide-index .guide-grid {
+  margin-top: 0;
 }
 
 .guide-card {

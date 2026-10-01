@@ -47,7 +47,7 @@ const pages = [
   {
     file: "guides/index.html",
     path: "/guides/",
-    h1: "Guides for a large gulf-front rental near Destin",
+    h1: "What to sort out before you book a house that has to hold a real group on this stretch of the gulf.",
     title: "Large Gulf-Front Rentals near Destin",
     image: "/images/gallery/29.jpg",
   },
@@ -136,6 +136,9 @@ for (const page of pages) {
   assert.match(html, /reservations@fivestargulfrentals\.com/);
   assert.match(html, /\(800\) 208-2324/);
   assert.equal(html.includes("per night"), false, page.file);
+  assert.equal(html.includes("Notes from the house"), false, page.file);
+  assert.equal(html.includes("Guides for a large gulf-front rental near Destin"), false, page.file);
+  assert.equal(html.includes("Why the private beach is the week"), false, page.file);
   assert.equal(html.includes("nightly"), false, page.file);
   assert.equal(/\$\s?\d/.test(html), false, page.file);
   const title = html.match(/<title>([^<]*)<\/title>/)[1];
@@ -197,6 +200,10 @@ assert.equal(read("README.md").includes("could not be saved"), false);
 const guidesHub = read("guides/index.html");
 const guidesHeader = guidesHub.slice(guidesHub.indexOf("<header"), guidesHub.indexOf("</header>"));
 assert.match(guidesHeader, /href="\/guides\/" aria-current="page"/);
+assert.match(guidesHub, /Why private beach access matters/);
+assert.match(guidesHub, /private beach and boardwalk/);
+assert.equal(guidesHub.includes("/images/gallery/07.jpg"), false);
+assert.equal(guidesHub.includes("/images/gallery/34.jpg"), false);
 const beachGuide = read("guides/private-beach-access/index.html");
 const beachHeader = beachGuide.slice(beachGuide.indexOf("<header"), beachGuide.indexOf("</header>"));
 assert.match(beachHeader, /href="\/guides\/" aria-current="page"/);
