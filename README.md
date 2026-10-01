@@ -69,7 +69,7 @@ Cloudflare Workers Builds deploys this repository with `npx wrangler deploy`, us
 
 - `"name"` must stay `seaclusion`.
 - `assets.directory` is `.`, so `index.html` at the repository root is the home page.
-- `main` is `src/worker.js`. `assets.run_worker_first` is only `/api/contact` and `/api/contact/`. Every other path is a static asset.
+- `main` is `src/worker.js`. `assets.run_worker_first` is true so the Worker can redirect `www` to the apex host. Pages are still static assets, served through the `ASSETS` binding. Only `/api/contact` and `/api/contact/` run the inquiry handler.
 - An assets-only Worker cannot hold variables. `"main"` is what makes the secrets possible. Do not put secret values in this repository.
 
 After the Worker is deployed, add these in **Workers & Pages → seaclusion → Settings → Variables and Secrets**. Add them for Production, and for Preview if that environment is offered. Then redeploy so the Worker picks them up.
@@ -88,6 +88,12 @@ Until `RESEND_API_KEY` and `CONTACT_EMAIL` are both set, `POST /api/contact` ret
 ## Canonical URLs
 
 `site.config.json` sets `"origin": "https://seaclusion.house"`. Canonical links, Open Graph URLs, JSON-LD, `sitemap.xml`, and the `Sitemap` line in `robots.txt` use that host. Submit `https://seaclusion.house/sitemap.xml` in Google Search Console. If the production host changes, update `origin` (no trailing slash), run `python3 scripts/build_pages.py`, and commit the regenerated pages, `sitemap.xml`, and `robots.txt`.
+
+The Worker answers `www.seaclusion.house` with a 301 to `https://seaclusion.house`, keeping the path and query. Attach `www` to this same Worker (proxied DNS) for that redirect to run. `*.workers.dev` responses include `X-Robots-Tag: noindex`. Pages on `seaclusion.house` stay indexable.
+
+## Security headers
+
+`_headers` keeps `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options`, and `Permissions-Policy`, and adds `Strict-Transport-Security` plus a Content-Security-Policy. Scripts, images, and the tour video (`/images/tour.mp4`) are same-origin. The policy allows the inline style attributes already in the HTML, and frames only this site and the OpenStreetMap embed. The Worker attaches the same headers to inquiry responses, which `_headers` does not cover.
 
 ## Photos
 
