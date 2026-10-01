@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Write the static Seaclusion pages. Facts come from the Wix site only."""
+"""Write the static Seaclusion pages.
+
+House facts come from the Wix site only. Guides add booking advice around
+those facts. They do not add amenities, photos, or rates.
+"""
 
 import json
 from pathlib import Path
@@ -26,6 +30,7 @@ NAV = [
     ("/floorplans/", "Floor Plans"),
     ("/gallery/", "Gallery"),
     ("/location/", "Location"),
+    ("/guides/", "Guides"),
     ("/tips/", "House Tips"),
 ]
 
@@ -93,7 +98,12 @@ def abs_url(path):
 def head(page):
     canonical = abs_url(page["path"])
     image = abs_url(page.get("image", "/images/og.jpg"))
+    image_alt = page.get(
+        "image_alt",
+        "Gulf-front exterior of Seaclusion, a beach home in Miramar Beach, Florida.",
+    )
     robots = page.get("robots", "index,follow")
+    og_type = page.get("og_type", "website")
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -105,12 +115,12 @@ def head(page):
   <link rel="canonical" href="{canonical}">
   <meta property="og:title" content="{page["title"]}">
   <meta property="og:description" content="{page["description"]}">
-  <meta property="og:type" content="website">
+  <meta property="og:type" content="{og_type}">
   <meta property="og:url" content="{canonical}">
   <meta property="og:site_name" content="Seaclusion">
   <meta property="og:locale" content="en_US">
   <meta property="og:image" content="{image}">
-  <meta property="og:image:alt" content="Gulf-front exterior of Seaclusion, a beach home in Miramar Beach, Florida.">
+  <meta property="og:image:alt" content="{image_alt}">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="{page["title"]}">
   <meta name="twitter:description" content="{page["description"]}">
@@ -129,7 +139,8 @@ def head(page):
 def header(current):
     links = []
     for href, label in NAV:
-        current_attr = ' aria-current="page"' if href == current else ""
+        on_guides = href == "/guides/" and current.startswith("/guides/")
+        current_attr = ' aria-current="page"' if href == current or on_guides else ""
         links.append(f'<a href="{href}"{current_attr}>{label}</a>')
     book_current = ' aria-current="page"' if current == "/contact/" else ""
     return f"""<a class="skip" href="#content">Skip to content</a>
@@ -190,6 +201,7 @@ def footer():
         <li><a href="/floorplans/">Floor plans</a></li>
         <li><a href="/gallery/">Gallery</a></li>
         <li><a href="/location/">Location</a></li>
+        <li><a href="/guides/">Guides</a></li>
         <li><a href="/tips/">House tips</a></li>
       </ul>
     </div>
@@ -233,8 +245,16 @@ def cta():
 """
 
 
-def crumbs(label):
-    return f'<p class="crumbs"><a href="/">Home</a> <span aria-hidden="true">/</span> {label}</p>'
+def crumbs(*parts):
+    bits = ['<a href="/">Home</a>']
+    for part in parts:
+        if isinstance(part, tuple):
+            href, label = part
+            bits.append(f'<a href="{href}">{label}</a>')
+        else:
+            bits.append(str(part))
+    inner = ' <span aria-hidden="true">/</span> '.join(bits)
+    return f'<p class="crumbs">{inner}</p>'
 
 
 def lodging_schema():
@@ -481,7 +501,7 @@ def home():
       <h2>Gulf front in Miramar Beach</h2>
       <p>{ADDRESS}</p>
       <p>The house is gulf front, with private beach access and a private beach boardwalk. The seclusion from the busy beaches of Destin is part of the stay.</p>
-      <p><a href="/location/">Map and directions</a></p>
+      <p><a href="/location/">Map and directions</a>. <a href="/guides/">Guides</a> cover how to choose a large house, why a private beach matters, and Miramar Beach compared with busier Destin.</p>
     </div>
     <div class="map-frame">
       <iframe title="Map of Seaclusion at 330 Tango Mar Drive, Miramar Beach" src="{MAP_EMBED}" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
@@ -765,6 +785,349 @@ def contact():
     return main
 
 
+def json_ld(data):
+    return '<script type="application/ld+json">' + json.dumps(data, separators=(",", ":")) + "</script>"
+
+
+def breadcrumb_schema(items):
+    elements = []
+    for index, (path, name) in enumerate(items, 1):
+        elements.append({
+            "@type": "ListItem",
+            "position": index,
+            "name": name,
+            "item": abs_url(path),
+        })
+    return json_ld({
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": elements,
+    })
+
+
+def article_schema(guide):
+    url = abs_url(guide["path"])
+    data = {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": guide["h1"],
+        "description": guide["description"],
+        "image": abs_url(guide["image"]),
+        "datePublished": "2026-10-01",
+        "dateModified": "2026-10-01",
+        "author": {
+            "@type": "Organization",
+            "name": "Seaclusion Beach Home",
+            "url": abs_url("/"),
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "Seaclusion",
+            "url": abs_url("/"),
+        },
+        "mainEntityOfPage": url,
+        "about": {
+            "@type": "VacationRental",
+            "name": "Seaclusion Beach Home",
+            "telephone": "+1-800-208-2324",
+            "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "330 Tango Mar Drive",
+                "addressLocality": "Miramar Beach",
+                "addressRegion": "FL",
+                "postalCode": "32550",
+                "addressCountry": "US",
+            },
+        },
+    }
+    if ORIGIN:
+        data["url"] = url
+    return json_ld(data)
+
+
+def guides_index_schema():
+    url = abs_url("/guides/")
+    data = {
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        "name": "Guides for a large gulf-front rental near Destin",
+        "description": "Notes for booking a large gulf-front house near Destin. The examples are Seaclusion in Miramar Beach.",
+        "mainEntity": {
+            "@type": "ItemList",
+            "itemListElement": [
+                {
+                    "@type": "ListItem",
+                    "position": index,
+                    "url": abs_url(guide["path"]),
+                    "name": guide["h1"],
+                }
+                for index, guide in enumerate(GUIDES, 1)
+            ],
+        },
+    }
+    if ORIGIN:
+        data["url"] = url
+    return json_ld(data)
+
+
+def house_plug(guide):
+    return f"""<aside class="house-callout">
+      <p class="kicker">The house</p>
+      <h2>{guide["plug_title"]}</h2>
+      <p>{guide["plug"]}</p>
+      <p>Call <a href="tel:{PHONE_TEL}">{PHONE_DISPLAY}</a> or email <a href="mailto:{EMAIL}">{EMAIL}</a>. Mention Seaclusion. Rates are quoted when you inquire.</p>
+      <div class="actions">
+        <a class="btn btn-solid" href="/contact/">Request to Book</a>
+        <a class="btn btn-line" href="/amenities/">See the amenities</a>
+      </div>
+    </aside>"""
+
+
+def guide_aside():
+    return f"""<aside class="guide-aside">
+      <p class="kicker">Book this house</p>
+      <h2>Seaclusion</h2>
+      <p>Gulf-front in Miramar Beach. The fit for the notes on this page.</p>
+      <ul class="guide-facts">
+        <li>Sleeps 24</li>
+        <li>9 bedrooms, 7.5 baths</li>
+        <li>Gulf-front Miramar Beach</li>
+        <li>Private beach</li>
+        <li>Pool and hot tub</li>
+        <li>Elevator, floors 1–3</li>
+      </ul>
+      <div class="actions">
+        <a class="btn btn-solid" href="/contact/">Request to Book</a>
+      </div>
+      <p><a href="tel:{PHONE_TEL}">{PHONE_DISPLAY}</a><br><a href="mailto:{EMAIL}">{EMAIL}</a></p>
+      <p class="note">{ADDRESS}. The elevator does not go to the parking level.</p>
+    </aside>"""
+
+
+def guide_related(guide):
+    items = "".join(
+        f'<li><a href="{other["path"]}">{other["card_title"]}</a></li>'
+        for other in GUIDES
+        if other["slug"] != guide["slug"]
+    )
+    return f"""<h2>More from these notes</h2>
+      <ul class="guide-related">{items}</ul>"""
+
+
+def render_guide(guide):
+    body = GUIDE_BODIES[guide["slug"]]()
+    return f"""
+<header class="page-hero">
+  <div class="wrap">
+    {crumbs(("/guides/", "Guides"), guide["crumb"])}
+    <p class="kicker">{guide["kicker"]}</p>
+    <h1>{guide["h1"]}</h1>
+    <p class="lede">{guide["lede"]}</p>
+  </div>
+</header>
+<section class="section">
+  <div class="wrap guide-layout">
+    <article class="prose guide-prose">
+      <figure class="frame guide-cover">
+        <img src="{guide["image"]}" alt="{guide["image_alt"]}" width="1600" height="1067">
+        <figcaption>{guide["caption"]}</figcaption>
+      </figure>
+      {body}
+      {house_plug(guide)}
+      {guide_related(guide)}
+    </article>
+    {guide_aside()}
+  </div>
+</section>
+"""
+
+
+def guides_index():
+    cards = []
+    for guide in GUIDES:
+        cards.append(
+            f"""<article class="guide-card">
+        <a href="{guide["path"]}">
+          <img src="{guide["image"]}" alt="{guide["image_alt"]}" width="1600" height="1067" loading="lazy">
+          <div>
+            <h2>{guide["card_title"]}</h2>
+            <p>{guide["card_text"]}</p>
+            <span class="more">Read the guide</span>
+          </div>
+        </a>
+      </article>"""
+        )
+    return f"""
+<header class="page-hero">
+  <div class="wrap">
+    {crumbs("Guides")}
+    <p class="kicker">Notes from the house</p>
+    <h1>Guides for a large gulf-front rental near Destin</h1>
+    <p class="lede">What to sort out before you book a house that has to hold a real group on this stretch of the gulf.</p>
+  </div>
+</header>
+<section class="section">
+  <div class="wrap">
+    <div class="split">
+      <figure class="frame">
+        <img src="/images/gallery/29.jpg" alt="Aerial view of Seaclusion, the private pool, and the gulf in Miramar Beach" width="1600" height="1067">
+      </figure>
+      <div class="prose">
+        <p>These are the questions that come up before a reunion or a retreat. Will everyone actually have a bed? Is the beach private? Is the house on the quieter side of the Destin area, or on the busy sand?</p>
+        <p>The examples are Seaclusion, because that is the house. It is a 5,700 square foot gulf-front rental at {ADDRESS}. It has 9 bedrooms and sleeps 24, with a private beach, a private pool and hot tub, and an elevator for floors 1–3. The elevator does not go to the parking level.</p>
+        <p>If you already know the dates, <a href="/contact/">request to book</a>. The notes below are the longer version. Photos are in the <a href="/gallery/">gallery</a>, and the map is on the <a href="/location/">location</a> page.</p>
+      </div>
+    </div>
+    <div class="guide-grid">
+      {"".join(cards)}
+    </div>
+  </div>
+</section>
+"""
+
+
+def large_beach_house_body():
+    return f"""
+      <p>A listing can say it sleeps 24 and still put a third of the group on couches. For a reunion, a company retreat, or a pile of cousins, the useful questions are ordinary. Where does everyone actually sleep? Does the elevator reach those rooms? Can two meals happen at once? Where do the cars go?</p>
+      <h2>Count beds, not the headline</h2>
+      <p>Ask for the bedroom list. Seaclusion is the 5,700 square foot gulf-front house at {ADDRESS}, and the list is 9 bedrooms on three living floors. Two second-floor rooms are gulf-front kings with private balconies. The rest are more kings and queens, plus a bunk room with two twin-over-twin bunks. That inventory is how the house sleeps 24. The <a href="/floorplans/">floor plans</a> show which door is which, which matters when someone needs a room that closes.</p>
+      <h2>Give the group more than one room to sit in</h2>
+      <p>One living room becomes a bottleneck around day two. This house has two. The main room is on the first floor, with seating that faces the gulf. The second floor has another living space, with a futon, lounge chairs, and a TV. The TVs are smart TVs with access to your streaming accounts, so the week does not depend on one login. Outside, four covered decks and a covered patio with games take the overflow.</p>
+      <h2>Two kitchens, and laundry that can keep up</h2>
+      <p>One kitchen looks like enough until breakfast and a late lunch land on the same stove. The first-floor kitchen has KitchenAid appliances and the same gulf views as the living room, with a breakfast nook and a formal dining room beside it. The third floor has a full kitchen of its own, next to the primary suite. There are 7.5 bathrooms. Laundry is two laundry rooms, plus a washer and dryer in the primary closet. A group this size notices laundry before it notices the view.</p>
+      <h2>The elevator stops short of the cars</h2>
+      <p>Three stories is a lot of luggage. The in-home elevator serves floors 1–3. It does not go to the parking level, so the stretch from the cars is a carry. Both elevator doors have to be closed or it will not run. The <a href="/tips/">house tips</a> have the short version of that. If someone in the group cannot do stairs at all, say so when you inquire. That parking-level gap is a real limit.</p>
+      <h2>Parking for seven</h2>
+      <p>If people are driving from different cities, seven spaces decide whether the first hour is a shuffle. Four bikes are included for the errands that should not move a car. The house is pet friendly, which is worth knowing before a dog arrives as a surprise.</p>
+      <h2>Pool, hot tub, and the beach in front</h2>
+      <p>A big house set back from the sand still means a daily trip to a public path. Seaclusion is gulf front in Miramar Beach. The private beach has a private boardwalk. The private pool and hot tub are on the gulf side. Complimentary beach chairs are available in season. The <a href="/amenities/">amenity list</a> is the short version, and the <a href="/gallery/">gallery</a> is the proof. Why that beach access matters on its own is the next note, along with <a href="/guides/miramar-beach-vs-destin/">why the house is in Miramar Beach</a> instead of on the busier Destin sand.</p>
+"""
+
+
+def private_beach_body():
+    return f"""
+      <p>Near the beach and on the beach get used as if they were the same sentence. They are not. Near the beach can mean a parking pass, a path shared with the next few buildings, and a wagon. Gulf front with private beach access means the sand is the front of the house.</p>
+      <h2>The walk is the difference</h2>
+      <p>Seaclusion is the second kind of stay. The address is {ADDRESS}, on the gulf in Miramar Beach, with a private beach and a private beach boardwalk. You are not lining up at a hotel path. With a group that sleeps 24, that shows up the first morning, when coolers and kids would otherwise be a project.</p>
+      <p>The first-floor living room and kitchen face the gulf, and patio doors open toward the shore. Two second-floor bedrooms are gulf-front kings with private balconies. The primary suite on the third floor has its own balcony, and the upper decks look out over the water. If the group booked the house for the gulf, those are the rooms that deliver it. The <a href="/floorplans/">floor plans</a> show which ones face the water.</p>
+      <h2>The pool stays on the same walk</h2>
+      <p>Beach chairs are complimentary in season, so the setup is not a separate errand every morning. The private pool and hot tub sit on the gulf side. A windy afternoon, or a nap that only half the group agrees to, does not require packing up for a public beach. Four covered decks cover the shade. The <a href="/gallery/">gallery</a> has the pool, the decks, and the view from the house.</p>
+      <h2>When a private beach is the wrong priority</h2>
+      <p>If the plan is to be gone from breakfast until dinner, a house a few rows back can be the right call. Say that when you inquire. If the plan is to stay in, cook, and treat the gulf as the schedule, the private beach is the feature the week is built on. The busier public beaches of Destin are a drive from here, which is the point of <a href="/guides/miramar-beach-vs-destin/">Miramar Beach versus Destin</a>.</p>
+      <p>The rest of the house still has to work for the headcount: 9 bedrooms, two kitchens, parking for seven, and an elevator for floors 1–3. That checklist is in <a href="/guides/large-beach-house/">choosing a large beach house</a>. The <a href="/location/">location page</a> has the map.</p>
+"""
+
+
+def miramar_vs_destin_body():
+    return f"""
+      <p>People search for a Destin beach house and then land on a Miramar Beach address. That is not a wrong turn. Miramar Beach is the gulf-front stretch just west of Destin proper. It is the city on this house: {ADDRESS}.</p>
+      <h2>Destin is the harbor town</h2>
+      <p>Charter boats, the harbor, and the beaches that fill up beside them. If the week is about being in the middle of that, book over there and expect the sand to feel like it. Seaclusion is set back from those busier beaches on purpose. The quieter gulf is the stay.</p>
+      <p>What you give up is walking out into the harbor district. Dinner in Destin, a fishing boat, or a lap through town is a drive east, not a stroll from the driveway. What you do not give up is the gulf. The house is gulf front, on a private beach, with a private pool and hot tub on the gulf side. For a group of 24 that wants one roof, that is the trade. Cousins in separate condos, plus a shuttle to a public access, is the other one.</p>
+      <h2>The house is set up for staying put</h2>
+      <p>Nine bedrooms, two kitchens, two living rooms, parking for seven, and four bikes. The in-home elevator reaches floors 1–3 and does not go to the parking level. The house is pet friendly, which matters when the dog is part of the headcount. That is how the house sleeps 24. The <a href="/amenities/">amenity list</a> and the <a href="/gallery/">gallery</a> are the detail.</p>
+      <h2>How to choose</h2>
+      <p>If half the group wants the harbor every night, say so in the inquiry. A gulf-front house in Miramar Beach is in the Destin area. It is not a room on the harbor. If the group wants the water out front and fewer people on it in the morning, this side of the coast is the one that matches. The map is on the <a href="/location/">location page</a>. What the days look like once you are here is in <a href="/guides/things-to-do-nearby/">what to do around the house</a>.</p>
+      <p>Restaurants are a separate subject. This site does not keep a dining list. <a href="https://www.eatingindestin.com">Eating in Destin</a> does.</p>
+"""
+
+
+def things_to_do_body():
+    return f"""
+      <p>The honest schedule for a house this size is that a lot of the week happens at {ADDRESS}. Twenty-four people do not need a packed itinerary. They need the gulf, a pool, and a kitchen that can feed them without a reservation.</p>
+      <h2>Most of the day is already here</h2>
+      <p>The private beach and the boardwalk are the morning. Beach chairs are complimentary in season. The private pool and hot tub are on the gulf side, so the afternoon does not need a plan. Four covered decks and a covered patio with games cover the hot part of the day. Four bikes are included when someone wants to move without loading a car.</p>
+      <p>Seaclusion has two kitchens, one on the first floor with gulf views and a full kitchen on the third floor, so lunch can stay home. A second living room covers the split between a game and a nap. Wi-Fi is in the house if somebody is still working, and the TVs use your own streaming accounts. The <a href="/gallery/">gallery</a> is the easiest way to see how that outdoor space sits on the gulf.</p>
+      <h2>When you do leave</h2>
+      <p>Destin is a drive east. The harbor is the reason most people go: fishing charters and the boats, on the busier side of this coast. That busier stretch is why the house sits in Miramar Beach instead. Go for the boat. Come back to the private beach out front. The comparison is spelled out in <a href="/guides/miramar-beach-vs-destin/">Miramar Beach versus Destin</a>.</p>
+      <p>If part of the group wants a public park for an afternoon, Henderson Beach State Park is on the gulf in Destin. It is a different kind of beach day than the private boardwalk out front.</p>
+      <p>West of the house, the coast continues toward 30A and the beach towns in that direction. It is a drive, not a walk, and it is optional. The week does not depend on it. A rainy day, or a day someone wants to be indoors in town, is a better time for the harbor and the outlet shopping in Destin than for forcing another hour on the sand. The house still has the two living rooms and the covered decks if the vote is to stay in.</p>
+      <h2>Where to eat</h2>
+      <p>This site does not keep a restaurant list. The kitchens at Seaclusion cover the meals you would rather not plan. <a href="https://www.eatingindestin.com">Eating in Destin</a> covers the ones you would.</p>
+      <p>If the week is mostly the house, the practical checks are still the bedroom count, the elevator, and parking. Those are in <a href="/guides/large-beach-house/">choosing a large beach house</a>. The address and map are on the <a href="/location/">location page</a>.</p>
+"""
+
+
+GUIDES = [
+    {
+        "slug": "large-beach-house",
+        "path": "/guides/large-beach-house/",
+        "crumb": "Large beach houses",
+        "kicker": "Sleeps a crowd",
+        "h1": "What to check before you book a large Destin-area beach house",
+        "lede": "Bedrooms, an elevator that reaches them, two kitchens, parking, and a pool. The example is a gulf-front house in Miramar Beach that sleeps 24.",
+        "title": "Choosing a Large Miramar Beach House That Sleeps a Crowd | Seaclusion",
+        "description": "What to check before booking a large Destin-area beach house: real bedrooms, an elevator, two kitchens, parking, a pool, and a private beach. Seaclusion sleeps 24 in Miramar Beach.",
+        "image": "/images/gallery/43.jpg",
+        "image_alt": "Aerial view of the Seaclusion house, private pool, and beach",
+        "caption": "Seaclusion from above, with the private pool and the gulf in front of the house.",
+        "card_title": "A house that really sleeps the group",
+        "card_text": "The headline number is the easy part. The stay is bedrooms, kitchens, parking, and whether the elevator reaches the rooms.",
+        "plug_title": "Seaclusion is the large house those checks describe",
+        "plug": "It sleeps 24 at 330 Tango Mar Drive in Miramar Beach. Gulf front, with a private beach, a private pool and hot tub, 9 bedrooms, two kitchens, parking for seven, and an elevator for floors 1–3.",
+    },
+    {
+        "slug": "private-beach-access",
+        "path": "/guides/private-beach-access/",
+        "crumb": "Private beach",
+        "kicker": "Gulf front",
+        "h1": "Why a private beach changes a gulf-front week",
+        "lede": "A house near a public path and a house with its own beach access are different vacations, especially once the group is big.",
+        "title": "Why Private Beach Access Matters on a Gulf-Front Rental | Seaclusion",
+        "description": "Gulf front with a private beach is a different week than a house near a public path. How that works at Seaclusion in Miramar Beach, including the boardwalk, beach chairs in season, and the pool and hot tub.",
+        "image": "/images/gallery/12.jpg",
+        "image_alt": "View from a covered deck at Seaclusion toward the gulf",
+        "caption": "The gulf from a covered deck at Seaclusion.",
+        "card_title": "Why the private beach is the week",
+        "card_text": "Gulf front means the sand is the front of the house, not a path you share with the buildings next door.",
+        "plug_title": "Seaclusion is that gulf-front stay",
+        "plug": "Private beach, private beach boardwalk, and a private pool and hot tub on the gulf side in Miramar Beach. The house sleeps 24, with 9 bedrooms and an elevator for floors 1–3.",
+    },
+    {
+        "slug": "miramar-beach-vs-destin",
+        "path": "/guides/miramar-beach-vs-destin/",
+        "crumb": "Miramar Beach",
+        "kicker": "The stretch of coast",
+        "h1": "Miramar Beach or the busier beaches of Destin",
+        "lede": "Same gulf, different week. Miramar Beach is the quieter frontage just west of the harbor town.",
+        "title": "Miramar Beach vs Destin for a Gulf-Front Group Rental | Seaclusion",
+        "description": "Miramar Beach is the quieter gulf-front stretch beside Destin. Why a group books Seaclusion there, and when the harbor is still a drive rather than the plan for the week.",
+        "image": "/images/gallery/26.jpg",
+        "image_alt": "Dusk view of the gulf-front Seaclusion house from above",
+        "caption": "Seaclusion at dusk, gulf front in Miramar Beach.",
+        "card_title": "Miramar Beach or busier Destin",
+        "card_text": "The harbor is a drive east. The house is on the quieter gulf, which is either the point or a mismatch.",
+        "plug_title": "Seaclusion is the Miramar Beach side of that choice",
+        "plug": "Gulf-front at 330 Tango Mar Drive, with a private beach, a private pool and hot tub, and room for a group. It sleeps 24 in 9 bedrooms, with an elevator for floors 1–3.",
+    },
+    {
+        "slug": "things-to-do-nearby",
+        "path": "/guides/things-to-do-nearby/",
+        "crumb": "Around the house",
+        "kicker": "The week",
+        "h1": "What a group actually does around this house",
+        "lede": "A short list. Most of it happens on the property. Destin is there when you want it.",
+        "title": "Things to Do Near a Miramar Beach Gulf-Front House | Seaclusion",
+        "description": "What a large group actually does around Seaclusion in Miramar Beach: the private beach, the pool and hot tub, a drive into Destin, and where to look for restaurants.",
+        "image": "/images/gallery/02.jpg",
+        "image_alt": "Private pool and hot tub on the gulf side of Seaclusion",
+        "caption": "The private pool and hot tub on the gulf side of the house.",
+        "card_title": "What to do around the house",
+        "card_text": "The beach, the pool, and the kitchens carry the week. Destin and a restaurant list are there when you want to leave.",
+        "plug_title": "Seaclusion is built for a week that stays put",
+        "plug": "Sleeps 24 on the gulf in Miramar Beach, with a private beach, a private pool and hot tub, 9 bedrooms, and an elevator for floors 1–3. The address is 330 Tango Mar Drive.",
+    },
+]
+
+
+GUIDE_BODIES = {
+    "large-beach-house": large_beach_house_body,
+    "private-beach-access": private_beach_body,
+    "miramar-beach-vs-destin": miramar_vs_destin_body,
+    "things-to-do-nearby": things_to_do_body,
+}
+
+
 def not_found():
     return """
 <header class="page-hero">
@@ -843,6 +1206,19 @@ PAGES = [
         "body": contact,
     },
     {
+        "path": "/guides/",
+        "file": ROOT / "guides" / "index.html",
+        "title": "Guides | Large Gulf-Front Rentals near Destin | Seaclusion",
+        "description": "Notes for booking a large gulf-front house near Destin: bedroom count, private beach access, and Miramar Beach compared with busier Destin. Seaclusion sleeps 24.",
+        "image": "/images/gallery/29.jpg",
+        "image_alt": "Aerial view of Seaclusion, the private pool, and the gulf in Miramar Beach",
+        "schema": guides_index_schema() + breadcrumb_schema([
+            ("/", "Home"),
+            ("/guides/", "Guides"),
+        ]),
+        "body": guides_index,
+    },
+    {
         "path": "/404.html",
         "file": ROOT / "404.html",
         "title": "Page not found | Seaclusion Beach Home",
@@ -852,6 +1228,29 @@ PAGES = [
         "body": not_found,
     },
 ]
+
+
+def _guide_page(guide):
+    return {
+        "path": guide["path"],
+        "file": ROOT / "guides" / guide["slug"] / "index.html",
+        "title": guide["title"],
+        "description": guide["description"],
+        "image": guide["image"],
+        "image_alt": guide["image_alt"],
+        "og_type": "article",
+        "schema": article_schema(guide) + breadcrumb_schema([
+            ("/", "Home"),
+            ("/guides/", "Guides"),
+            (guide["path"], guide["crumb"]),
+        ]),
+        "body": lambda guide=guide: render_guide(guide),
+    }
+
+
+_not_found_page = PAGES.pop()
+PAGES.extend(_guide_page(guide) for guide in GUIDES)
+PAGES.append(_not_found_page)
 
 
 def write_sitemap():

@@ -40,8 +40,15 @@ CONTACT_EMAIL=you@example.com
 - `/floorplans/` — first, second, and third floors, with the Wix floor-plan drawings
 - `/gallery/` — video tour and 51 photographs from the Wix gallery
 - `/location/` — address and map
+- `/guides/` — notes on booking a large gulf-front house near Destin
+- `/guides/large-beach-house/` — bedrooms, elevator, kitchens, parking, pool
+- `/guides/private-beach-access/` — why gulf-front and a private beach matter
+- `/guides/miramar-beach-vs-destin/` — Miramar Beach compared with busier Destin
+- `/guides/things-to-do-nearby/` — the week at the house, plus a short note on leaving
 - `/tips/` — elevator, televisions, balcony locks
 - `/contact/` — inquiry form
+
+Guides are generated from the `GUIDES` list in `scripts/build_pages.py`. House facts in those pages stay limited to what the rest of the site already says. Restaurant notes stay off this site; the nearby guide links to Eating in Destin.
 
 The video tour plays from `images/tour.mp4` on the home page and the gallery.
 

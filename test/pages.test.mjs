@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 
 const pages = [
   {
@@ -44,6 +44,41 @@ const pages = [
     h1: "Request to book this Miramar Beach home",
     title: "Seaclusion Gulf-Front Rental, Miramar Beach",
   },
+  {
+    file: "guides/index.html",
+    path: "/guides/",
+    h1: "Guides for a large gulf-front rental near Destin",
+    title: "Large Gulf-Front Rentals near Destin",
+    image: "/images/gallery/29.jpg",
+  },
+  {
+    file: "guides/large-beach-house/index.html",
+    path: "/guides/large-beach-house/",
+    h1: "What to check before you book a large Destin-area beach house",
+    title: "Choosing a Large Miramar Beach House",
+    image: "/images/gallery/43.jpg",
+  },
+  {
+    file: "guides/private-beach-access/index.html",
+    path: "/guides/private-beach-access/",
+    h1: "Why a private beach changes a gulf-front week",
+    title: "Why Private Beach Access Matters",
+    image: "/images/gallery/12.jpg",
+  },
+  {
+    file: "guides/miramar-beach-vs-destin/index.html",
+    path: "/guides/miramar-beach-vs-destin/",
+    h1: "Miramar Beach or the busier beaches of Destin",
+    title: "Miramar Beach vs Destin",
+    image: "/images/gallery/26.jpg",
+  },
+  {
+    file: "guides/things-to-do-nearby/index.html",
+    path: "/guides/things-to-do-nearby/",
+    h1: "What a group actually does around this house",
+    title: "Things to Do Near a Miramar Beach",
+    image: "/images/gallery/02.jpg",
+  },
 ];
 
 function read(file) {
@@ -64,7 +99,12 @@ for (const page of pages) {
   assert.match(html, new RegExp(`property="og:url" content="${canonical.replaceAll("/", "\\/")}"`));
   assert.match(html, /property="og:title"/);
   assert.match(html, /property="og:description"/);
-  assert.match(html, /property="og:image" content="https:\/\/seaclusion\.house\/images\/og\.jpg"/);
+  const imagePath = page.image || "/images/og.jpg";
+  const imageUrl = `https://seaclusion.house${imagePath}`.replaceAll("/", "\\/");
+  assert.match(html, new RegExp(`property="og:image" content="${imageUrl}"`));
+  if (page.image) {
+    assert.equal(existsSync(page.image.slice(1)), true, page.image);
+  }
   assert.match(html, /330 Tango Mar Drive/);
   const footerStart = html.indexOf("<footer");
   assert.ok(footerStart >= 0, page.file);
@@ -75,8 +115,10 @@ for (const page of pages) {
   assert.match(footer, /aria-label="Facebook"/);
   assert.match(footer, /aria-label="Instagram"/);
   assert.match(footer, /aria-label="TikTok"/);
+  assert.match(footer, /href="\/guides\/"/);
   const headerEnd = html.indexOf("</header>");
   const header = html.slice(html.indexOf("<header"), headerEnd);
+  assert.match(header, /href="\/guides\/"/);
   assert.equal((header.match(/Request to Book/g) || []).length, 1, page.file);
   assert.match(header, /header-cta/);
   assert.equal(header.includes("nav-book"), false, page.file);
@@ -151,6 +193,28 @@ assert.match(home, /src="\/images\/tour\.mp4"/);
 assert.equal(gallery.includes("could not be saved"), false);
 assert.equal(home.includes("could not be saved"), false);
 assert.equal(read("README.md").includes("could not be saved"), false);
+
+const guidesHub = read("guides/index.html");
+const guidesHeader = guidesHub.slice(guidesHub.indexOf("<header"), guidesHub.indexOf("</header>"));
+assert.match(guidesHeader, /href="\/guides\/" aria-current="page"/);
+const beachGuide = read("guides/private-beach-access/index.html");
+const beachHeader = beachGuide.slice(beachGuide.indexOf("<header"), beachGuide.indexOf("</header>"));
+assert.match(beachHeader, /href="\/guides\/" aria-current="page"/);
+assert.match(beachGuide, /Sleeps 24/);
+assert.match(beachGuide, /private pool and hot tub/i);
+assert.match(beachGuide, /elevator/i);
+assert.match(beachGuide, /Request to Book/);
+assert.equal(beachGuide.includes("eatingindestin"), false);
+
+const things = read("guides/things-to-do-nearby/index.html");
+assert.match(things, /https:\/\/www\.eatingindestin\.com/);
+assert.equal((things.match(/eatingindestin\.com/g) || []).length, 1);
+const miramar = read("guides/miramar-beach-vs-destin/index.html");
+assert.equal((miramar.match(/eatingindestin\.com/g) || []).length, 1);
+const choosing = read("guides/large-beach-house/index.html");
+assert.equal(choosing.includes("eatingindestin"), false);
+assert.match(choosing, /floors 1/);
+assert.match(choosing, /does not go to the parking level/);
 
 const sitemap = read("sitemap.xml");
 assert.equal((sitemap.match(/<loc>/g) || []).length, pages.length);
