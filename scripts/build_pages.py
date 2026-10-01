@@ -762,7 +762,7 @@ PAGES = [
         "path": "/",
         "file": ROOT / "index.html",
         "title": "Seaclusion | Gulf-Front 9-Bedroom Vacation Rental in Miramar Beach",
-        "description": "Seaclusion is a 5,700 sq ft gulf-front vacation rental at 330 Tango Mar Drive, Miramar Beach, Florida. Nine bedrooms, a private pool and hot tub, and a private beach. Sleeps 24.",
+        "description": "Seaclusion is a 5,700 sq ft gulf-front vacation rental at 330 Tango Mar Drive, Miramar Beach, Florida, near Destin. Nine bedrooms, a private pool and hot tub, and a private beach. Sleeps 24.",
         "image": "/images/og.jpg",
         "schema": lodging_schema(),
         "lightbox": True,

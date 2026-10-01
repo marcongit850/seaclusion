@@ -59,10 +59,12 @@ for (const page of pages) {
   assert.match(html, new RegExp(`<h1>${page.h1}</h1>`));
   assert.equal((html.match(/<h1>/g) || []).length, 1, page.file);
   assert.match(html, /<meta name="description" content="[^"]{40,}">/);
-  assert.match(html, /rel="canonical"/);
+  const canonical = `https://seaclusion.house${page.path}`;
+  assert.match(html, new RegExp(`rel="canonical" href="${canonical.replaceAll("/", "\\/")}"`));
+  assert.match(html, new RegExp(`property="og:url" content="${canonical.replaceAll("/", "\\/")}"`));
   assert.match(html, /property="og:title"/);
   assert.match(html, /property="og:description"/);
-  assert.match(html, /property="og:image"/);
+  assert.match(html, /property="og:image" content="https:\/\/seaclusion\.house\/images\/og\.jpg"/);
   assert.match(html, /330 Tango Mar Drive/);
   const footerStart = html.indexOf("<footer");
   assert.ok(footerStart >= 0, page.file);
@@ -141,10 +143,15 @@ assert.equal(home.includes("could not be saved"), false);
 assert.equal(read("README.md").includes("could not be saved"), false);
 
 const sitemap = read("sitemap.xml");
+assert.equal((sitemap.match(/<loc>/g) || []).length, pages.length);
+assert.equal(sitemap.includes("404"), false);
 for (const page of pages) {
-  assert.match(sitemap, new RegExp(page.path.replaceAll("/", "\\/")));
+  assert.match(sitemap, new RegExp(`<loc>https://seaclusion\\.house${page.path.replaceAll("/", "\\/")}</loc>`));
 }
 const robots = read("robots.txt");
-assert.match(robots, /Sitemap:/);
+assert.match(robots, /User-agent: \*/);
+assert.match(robots, /Allow: \//);
+assert.match(robots, /Sitemap: https:\/\/seaclusion\.house\/sitemap\.xml/);
+assert.match(home, /"url":"https:\/\/seaclusion\.house\/"/);
 
 console.log(`passed ${pages.length} pages`);

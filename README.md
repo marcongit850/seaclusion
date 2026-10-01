@@ -80,7 +80,7 @@ Until `RESEND_API_KEY` and `CONTACT_EMAIL` are both set, `POST /api/contact` ret
 
 ## Canonical URLs
 
-`site.config.json` has `"origin": ""`. Canonical links, Open Graph URLs, and `sitemap.xml` are root-relative until an origin is set, so they follow whatever host serves the site. When the production domain is known, set `origin` to that `https://` URL, run `python3 scripts/build_pages.py`, and commit the regenerated pages, `sitemap.xml`, and `robots.txt`.
+`site.config.json` sets `"origin": "https://seaclusion.house"`. Canonical links, Open Graph URLs, JSON-LD, `sitemap.xml`, and the `Sitemap` line in `robots.txt` use that host. Submit `https://seaclusion.house/sitemap.xml` in Google Search Console. If the production host changes, update `origin` (no trailing slash), run `python3 scripts/build_pages.py`, and commit the regenerated pages, `sitemap.xml`, and `robots.txt`.
 
 ## Photos
 
