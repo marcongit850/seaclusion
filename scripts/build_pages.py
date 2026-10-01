@@ -269,6 +269,15 @@ def page_shell(page, main):
     return html
 
 
+def tour_video():
+    return """<figure class="tour">
+      <video controls playsinline preload="metadata" width="406" height="720">
+        <source src="/images/tour.mp4" type="video/mp4">
+      </video>
+      <figcaption>Video tour of Seaclusion, the gulf-front home in Miramar Beach.</figcaption>
+    </figure>"""
+
+
 def shot(filename, alt, eager=False):
     loading = "eager" if eager else "lazy"
     return (
@@ -398,6 +407,17 @@ def home():
       <a class="btn btn-line" href="/gallery/">Open the full gallery</a>
     </div>
     <div class="mosaic">{mosaic}</div>
+  </div>
+</section>
+<section class="section" style="padding-top:0">
+  <div class="wrap tour-layout">
+    <div class="prose">
+      <p class="kicker">Video tour</p>
+      <h2>Walk through the gulf-front house</h2>
+      <p>This is the Seaclusion video tour: the beachfront home at {ADDRESS}, with the private pool and hot tub, the rooms, and the gulf.</p>
+      <p><a href="/gallery/">See the tour with the photo gallery</a></p>
+    </div>
+    {tour_video()}
   </div>
 </section>
 <section class="section" style="padding-top:0">
@@ -535,15 +555,25 @@ def gallery():
 <header class="page-hero">
   <div class="wrap">
     {crumbs("Gallery")}
-    <p class="kicker">25 photographs</p>
+    <p class="kicker">Video tour and photographs</p>
     <h1>Photos of the gulf-front home in Miramar Beach</h1>
     <p class="lede">Seaclusion at {ADDRESS}: the beachfront house, private pool and hot tub, kitchens, bedrooms, and decks.</p>
   </div>
 </header>
 <section class="section">
+  <div class="wrap">
+    <div class="rule">
+      <div>
+        <p class="kicker">Video tour</p>
+        <h2>Play the walk-through</h2>
+      </div>
+    </div>
+    {tour_video()}
+  </div>
+</section>
+<section class="section" style="padding-top:0">
   <div class="wrap-wide">
     <div class="gallery-grid">{grid}</div>
-    <p class="note" style="margin-top:1.2rem">These photographs are from the Seaclusion gallery. The Wix site also has a short video tour. That video file could not be saved here. To show it on this page, add it as <code>images/tour.mp4</code>.</p>
   </div>
 </section>
 """

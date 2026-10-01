@@ -104,6 +104,11 @@ assert.match(contact, /We will get back to you ASAP/);
 
 const gallery = read("gallery/index.html");
 assert.equal((gallery.match(/data-shot/g) || []).length, 25);
+assert.match(gallery, /src="\/images\/tour\.mp4"/);
+assert.match(home, /src="\/images\/tour\.mp4"/);
+assert.equal(gallery.includes("could not be saved"), false);
+assert.equal(home.includes("could not be saved"), false);
+assert.equal(read("README.md").includes("could not be saved"), false);
 
 const sitemap = read("sitemap.xml");
 for (const page of pages) {
