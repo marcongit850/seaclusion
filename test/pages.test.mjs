@@ -193,6 +193,35 @@ assert.equal((locationMain.match(/<img\b/g) || []).length, 0);
 assert.match(locationMain, /330 Tango Mar Drive/);
 assert.match(gallery, /src="\/images\/tour\.mp4"/);
 assert.match(home, /src="\/images\/tour\.mp4"/);
+assert.match(home, /class="video-tour" aria-label="Video tour"/);
+assert.match(home, /poster="\/images\/seaclusion-home-tour-poster\.jpg"/);
+assert.match(home, /src="\/videos\/seaclusion-home-tour\.mp4"/);
+assert.match(home, /class="wrap intro-band"/);
+assert.equal(home.includes("autoplay"), false);
+assert.equal(/<video[^>]*\bloop\b/.test(home), false);
+const homeTourStart = home.indexOf('<figure class="video-tour"');
+const homeTour = home.slice(homeTourStart, home.indexOf("</figure>", homeTourStart) + "</figure>".length);
+assert.equal(homeTour.includes("—"), false);
+assert.equal(homeTour.includes("–"), false);
+assert.equal(homeTour.includes("<figcaption"), false);
+for (const file of [
+  "amenities/index.html",
+  "floorplans/index.html",
+  "gallery/index.html",
+  "location/index.html",
+  "guides/index.html",
+  "guides/large-beach-house/index.html",
+  "guides/private-beach-access/index.html",
+  "guides/miramar-beach-vs-destin/index.html",
+  "guides/things-to-do-nearby/index.html",
+  "tips/index.html",
+  "contact/index.html",
+  "404.html",
+]) {
+  const pageHtml = read(file);
+  assert.equal(pageHtml.includes("seaclusion-home-tour"), false, file);
+  assert.equal(pageHtml.includes('class="video-tour"'), false, file);
+}
 assert.equal(gallery.includes("could not be saved"), false);
 assert.equal(home.includes("could not be saved"), false);
 assert.equal(read("README.md").includes("could not be saved"), false);

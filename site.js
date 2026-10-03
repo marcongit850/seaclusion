@@ -75,6 +75,65 @@
     updateFilmCue();
   }
 
+  var tour = document.querySelector(".video-tour");
+  if (tour) {
+    var tourVideo = tour.querySelector("video");
+    var tourButton = tour.querySelector(".video-tour-control");
+    var tourLabel = tourButton && tourButton.querySelector(".sr-only");
+    var playIcon = tour.querySelector(".video-tour-icon-play");
+    var stopIcon = tour.querySelector(".video-tour-icon-stop");
+    if (tourVideo && tourButton && tourLabel && playIcon && stopIcon) {
+      var tourToken = 0;
+
+      function setTourPlaying(on) {
+        tourButton.setAttribute("aria-pressed", on ? "true" : "false");
+        tourLabel.textContent = on ? "Stop video tour" : "Play video tour";
+        playIcon.hidden = on;
+        stopIcon.hidden = !on;
+      }
+
+      function showTourPoster() {
+        tourVideo.pause();
+        try { tourVideo.currentTime = 0; } catch (err) {}
+        tour.classList.remove("is-playing");
+        setTourPlaying(false);
+      }
+
+      function startTour() {
+        var mine = ++tourToken;
+        tourVideo.muted = false;
+        setTourPlaying(true);
+        var pending = tourVideo.play();
+        if (pending && pending.then) {
+          pending.then(function () {
+            if (mine !== tourToken) showTourPoster();
+          }).catch(function () {
+            if (mine === tourToken) showTourPoster();
+          });
+        }
+      }
+
+      tourButton.addEventListener("click", function () {
+        if (tourVideo.paused || tourVideo.ended) startTour();
+        else {
+          tourToken += 1;
+          showTourPoster();
+        }
+      });
+      tourVideo.addEventListener("playing", function () {
+        if (!tourVideo.paused && !tourVideo.ended) tour.classList.add("is-playing");
+      });
+      tourVideo.addEventListener("ended", function () {
+        tourToken += 1;
+        showTourPoster();
+      });
+      tourVideo.removeAttribute("controls");
+      tour.classList.add("is-ready");
+      tourButton.hidden = false;
+      setTourPlaying(false);
+    }
+  }
+
   var form = document.querySelector("[data-contact-form]");
   if (!form) return;
 
