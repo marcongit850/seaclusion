@@ -344,6 +344,27 @@ def tour_video():
     </figure>"""
 
 
+def home_video_tour():
+    """Portrait clip beside the home intro. Poster until play; stop returns to the poster."""
+    return """<figure class="video-tour" aria-label="Video tour">
+      <div class="video-tour-frame">
+        <video id="home-video-tour" controls playsinline preload="none" poster="/images/seaclusion-home-tour-poster.jpg" width="540" height="960">
+          <source src="/videos/seaclusion-home-tour.mp4" type="video/mp4">
+        </video>
+        <img class="video-tour-poster" src="/images/seaclusion-home-tour-poster.jpg" alt="" width="540" height="960">
+        <button type="button" class="video-tour-control" hidden>
+          <svg class="video-tour-icon video-tour-icon-play" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path fill="currentColor" d="M9 6.5v11l9-5.5-9-5.5z"/>
+          </svg>
+          <svg class="video-tour-icon video-tour-icon-stop" viewBox="0 0 24 24" aria-hidden="true" focusable="false" hidden>
+            <path fill="currentColor" d="M7 7h10v10H7z"/>
+          </svg>
+          <span class="sr-only">Play video tour</span>
+        </button>
+      </div>
+    </figure>"""
+
+
 def shot(filename, alt, eager=False):
     loading = "eager" if eager else "lazy"
     return (
@@ -360,7 +381,7 @@ def home():
   <img src="/images/hero-collage.jpg" alt="Collage of the gulf-front Seaclusion house, private pool, beach boardwalk, and decks in Miramar Beach" width="1916" height="821">
 </section>
 <section class="intro-panel">
-  <div class="wrap">
+  <div class="wrap intro-band">
     <div class="intro-card">
       <p class="kicker">Seaclusion Beach Home</p>
       <h1>Luxury Beachfront Home in Destin</h1>
@@ -371,6 +392,7 @@ def home():
         <a class="btn btn-line" href="/gallery/">View the gallery</a>
       </div>
     </div>
+    {home_video_tour()}
     <div class="stats" aria-label="Home at a glance">
       <div><strong>24</strong><span>Sleeps</span></div>
       <div><strong>9</strong><span>Bedrooms</span></div>
