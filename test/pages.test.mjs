@@ -85,6 +85,22 @@ function read(file) {
   return readFileSync(file, "utf8");
 }
 
+function assertGoogleTag(html, file) {
+  const head = html.slice(0, html.indexOf("</head>"));
+  assert.equal((html.match(/G-HC0CM00BN2/g) || []).length, 2, file);
+  assert.equal((head.match(/G-HC0CM00BN2/g) || []).length, 2, file);
+  assert.equal((head.match(/googletagmanager\.com\/gtag\/js/g) || []).length, 1, file);
+  assert.match(
+    head,
+    /<script async src="https:\/\/www\.googletagmanager\.com\/gtag\/js\?id=G-HC0CM00BN2"><\/script>/,
+  );
+  assert.match(head, /window\.dataLayer = window\.dataLayer \|\| \[\];/);
+  assert.match(head, /function gtag\(\)\{dataLayer\.push\(arguments\);\}/);
+  assert.match(head, /gtag\('js', new Date\(\)\);/);
+  assert.match(head, /gtag\('config', 'G-HC0CM00BN2'\);/);
+  assert.equal(html.includes("googletagmanager.com/gtm.js"), false, file);
+}
+
 const titles = new Set();
 const h1s = new Set();
 
@@ -133,6 +149,7 @@ for (const page of pages) {
   assert.match(html, /private beach/i);
   assert.match(html, /gulf/i);
   assert.match(html, /href="\/contact\/"/);
+  assertGoogleTag(html, page.file);
   assert.match(html, /reservations@fivestargulfrentals\.com/);
   assert.match(html, /\(800\) 208-2324/);
   assert.equal(html.includes("per night"), false, page.file);
@@ -148,6 +165,8 @@ for (const page of pages) {
   titles.add(title);
   h1s.add(h1);
 }
+
+assertGoogleTag(read("404.html"), "404.html");
 
 const home = read("index.html");
 assert.match(home, /src="\/images\/hero-collage\.jpg"/);

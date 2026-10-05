@@ -93,7 +93,7 @@ The Worker answers `www.seaclusion.house` with a 301 to `https://seaclusion.hous
 
 ## Security headers
 
-`_headers` keeps `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options`, and `Permissions-Policy`, and adds `Strict-Transport-Security` plus a Content-Security-Policy. Scripts, images, and the tour video (`/images/tour.mp4`) are same-origin. The policy allows the inline style attributes already in the HTML, and frames only this site and the OpenStreetMap embed. The Worker attaches the same headers to inquiry responses, which `_headers` does not cover.
+`_headers` keeps `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options`, and `Permissions-Policy`, and adds `Strict-Transport-Security` plus a Content-Security-Policy. Scripts, images, and the tour video (`/images/tour.mp4`) are same-origin, except Google Analytics 4. `scripts/build_pages.py` adds the gtag.js snippet to every page. The policy allows that inline bootstrap by hash, and allows script, image, and connect requests to `www.googletagmanager.com`, `*.google-analytics.com`, and `*.analytics.google.com`. It still allows the inline style attributes already in the HTML, and frames only this site and the OpenStreetMap embed. The Worker attaches the same headers to inquiry responses, which `_headers` does not cover.
 
 ## Photos
 
