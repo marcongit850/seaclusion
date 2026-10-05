@@ -5,16 +5,28 @@
 export const CANONICAL_HOST = "seaclusion.house";
 
 // Pages, CSS, scripts, images, and the tour video (/images/tour.mp4) are
-// same-origin. style-src allows the inline style attributes already in the
-// HTML. script-src does not. The map iframe is the only third-party frame.
+// same-origin, except the GA4 tag. style-src allows the inline style
+// attributes already in the HTML. The inline gtag bootstrap is allowed by
+// its script-src hash, not unsafe-inline. The map iframe is the only
+// third-party frame.
+//
+// SHA-256 of the inline script in scripts/build_pages.py google_tag().
+// GA4 also beacons with images, so the same hosts are on img-src.
+const GA_ORIGINS = [
+  "https://www.googletagmanager.com",
+  "https://*.google-analytics.com",
+  "https://*.analytics.google.com",
+].join(" ");
+const GA_INLINE_HASH = "'sha256-acZxxLGNVE9dOUSzor1bD4p7dQ2Ji4MnHsej1o8u1ts='";
+
 export const CONTENT_SECURITY_POLICY = [
   "default-src 'self'",
-  "script-src 'self'",
+  `script-src 'self' ${GA_INLINE_HASH} ${GA_ORIGINS}`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self'",
+  `img-src 'self' ${GA_ORIGINS}`,
   "font-src 'self'",
   "media-src 'self'",
-  "connect-src 'self'",
+  `connect-src 'self' ${GA_ORIGINS}`,
   "form-action 'self'",
   "frame-src 'self' https://www.openstreetmap.org",
   "frame-ancestors 'self'",

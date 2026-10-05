@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { DEFAULT_FROM } from "../src/contact.js";
 import {
@@ -104,6 +105,23 @@ await check("static headers keep the existing policy and add HSTS and CSP", () =
   assert.match(CONTENT_SECURITY_POLICY, /frame-src 'self' https:\/\/www\.openstreetmap\.org/);
   assert.match(CONTENT_SECURITY_POLICY, /connect-src 'self'/);
   assert.match(CONTENT_SECURITY_POLICY, /form-action 'self'/);
+  const gaOrigins = "https://www.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com";
+  for (const directive of ["script-src", "img-src", "connect-src"]) {
+    const match = CONTENT_SECURITY_POLICY.match(new RegExp(`${directive} ([^;]*)`));
+    assert.ok(match, directive);
+    assert.equal(match[1].includes(gaOrigins), true, directive);
+    assert.equal(match[1].includes("unsafe-inline"), false, directive);
+  }
+  assert.match(CONTENT_SECURITY_POLICY, /script-src 'self' 'sha256-[A-Za-z0-9+/]+=+'/);
+  const home = readFileSync("index.html", "utf8");
+  const head = home.slice(0, home.indexOf("</head>"));
+  const open = head.indexOf("<script>");
+  assert.ok(open >= 0);
+  const from = open + "<script>".length;
+  const close = head.indexOf("</script>", from);
+  const inline = head.slice(from, close);
+  const hash = createHash("sha256").update(inline, "utf8").digest("base64");
+  assert.equal(CONTENT_SECURITY_POLICY.includes(`'sha256-${hash}'`), true);
 
   const preview = blocks.find((block) => block.path.includes("workers.dev"));
   assert.ok(preview);

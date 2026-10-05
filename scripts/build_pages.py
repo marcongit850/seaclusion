@@ -24,6 +24,9 @@ MAP_EMBED = "https://www.openstreetmap.org/export/embed.html?bbox=-86.356%2C30.3
 MAP_LINK = "https://www.openstreetmap.org/?mlat=30.37199&amp;mlon=-86.34367#map=17/30.37199/-86.34367"
 DIRECTIONS = "https://www.google.com/maps/search/?api=1&amp;query=330+Tango+Mar+Drive%2C+Miramar+Beach%2C+FL+32550"
 
+# Approved GA4 property. Used only by the shared head snippet below.
+GA_MEASUREMENT_ID = "G-HC0CM00BN2"
+
 NAV = [
     ("/", "Home"),
     ("/amenities/", "Amenities"),
@@ -95,6 +98,24 @@ def abs_url(path):
     return path
 
 
+def google_tag():
+    """Standard GA4 gtag.js snippet, injected once from head()."""
+    lines = [
+        "window.dataLayer = window.dataLayer || [];",
+        "function gtag(){dataLayer.push(arguments);}",
+        "gtag('js', new Date());",
+        f"gtag('config', '{GA_MEASUREMENT_ID}');",
+    ]
+    inline = "\n".join(f"    {line}" for line in lines)
+    return (
+        "  <!-- Google tag (gtag.js) -->\n"
+        f'  <script async src="https://www.googletagmanager.com/gtag/js?id={GA_MEASUREMENT_ID}"></script>\n'
+        "  <script>\n"
+        f"{inline}\n"
+        "  </script>"
+    )
+
+
 def head(page):
     canonical = abs_url(page["path"])
     image = abs_url(page.get("image", "/images/og.jpg"))
@@ -109,6 +130,7 @@ def head(page):
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+{google_tag()}
   <title>{page["title"]}</title>
   <meta name="description" content="{page["description"]}">
   <meta name="robots" content="{robots}">
